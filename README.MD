@@ -12,7 +12,9 @@ Download and open __pixel.html__.
 
 ### Notice
 
-If the __col__ is setting more than 100, the pixel style table may be half-baked.
+If the __col__ is less than 50, there are some animations.
+
+If the __col__ is setting more than 130, the pixel style table may be incomplete.
 
 ### Completment
 

@@ -30,7 +30,7 @@
             cursor: pointer;
             text-align: center;
         }
-
+        
         .setting div input {
             color: deepskyblue;
             background-color: rgba(0, 0, 0, 0);
@@ -39,11 +39,11 @@
             border: 0;
             outline: none;
         }
-
+        
         .setting div:hover {
             border-style: dashed;
         }
-
+        
         .preview {
             position: fixed;
             top: 27%;
@@ -88,17 +88,17 @@
     </div>
 </body>
 <script>
-    var $ = document.querySelector.bind(document);
+    let $ = document.querySelector.bind(document);
 
-    var preview = $('img');
-    var canvas = document.createElement('canvas').getContext('2d')
+    let preview = $('img');
+    let canvas = document.createElement('canvas').getContext('2d')
 
-    var row = 50;
-    var col = 50;
+    let row = 50;
+    let col = 50;
 
     function Pixel() {
         return new Promise((resolve, reject) => {
-            var file = $('input[type=file]').files[0];
+            let file = $('input[type=file]').files[0];
             if (file)
                 var reader = new FileReader();
             reader.onload = (event) => {
@@ -117,22 +117,42 @@
 
             createTable(row, col);
             canvas.drawImage(preview, 0, 0, col, row);
-            var tr = document.getElementsByTagName('tr');
 
-            for (var i = 0; i < row; i++) {
-                var td = tr[i].childNodes
-                for (var j = 0; j < col; j++) {
-                    td[j].style.backgroundColor = toRGBA(canvas.getImageData(j, i, 1, 1).data);
+            if (col < 51) {
+                let i = 0;
+                let j = 0;
+                let td = document.getElementsByTagName('td')
+                function todo() {
+                    if (i < row && j < col)
+                        td[i * col + j].style.backgroundColor = toRGBA(canvas.getImageData(j, i, 1, 1).data);
+                    if (j < col) {
+                        j++;
+                        setTimeout(todo, 0);
+                    } else {
+                        if (i < row) {
+                            j = 0; i++;
+                            setTimeout(todo, 0);
+                        }
+                    }
+                }
+                todo();
+            } else {
+                let tr = document.getElementsByTagName('tr');
+                for (let i = 0; i < row; i++) {
+                    let td = tr[i].childNodes
+                    for (let j = 0; j < col; j++) {
+                        td[j].style.backgroundColor = toRGBA(canvas.getImageData(j, i, 1, 1).data);
+                    }
                 }
             }
         })
     }
 
     function createTable(rows, cols) {
-        var html = '';
-        for (var i = 0; i < rows; i++) {
+        let html = '';
+        for (let i = 0; i < rows; i++) {
             html += '<tr>';
-            for (var j = 0; j < cols; j++) {
+            for (let j = 0; j < cols; j++) {
                 html += '<td></td>';
             }
             html += '</tr>';
@@ -147,7 +167,7 @@
 
     $('input[type=file]').addEventListener('change', previewFile)
     $('input[type=text]').addEventListener('change', (event) => {
-        var num = Number.parseInt(event.target.value);
+        let num = Number.parseInt(event.target.value);
         col = num || 50;
         previewFile();
     })
