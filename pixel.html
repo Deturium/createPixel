@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Pixel</title>
+    <style>
+        body {
+            font-family: Helvetica, sans-serif;
+            text-align: center
+        }
+        
+        .setting {
+            position: absolute;
+            top: 5%;
+            right: 140px;
+            width: 200px;
+        }
+        
+        .setting div {
+            width: 170px;
+            margin: 15px;
+            padding: 10px;
+            color: deepskyblue;
+            border: solid 2px deepskyblue;
+        }
+        
+        .setting div label {
+            font-size: 17px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .setting div input {
+            color: deepskyblue;
+            background-color: rgba(0, 0, 0, 0);
+            font-size: 16px;
+            text-align: center;
+            border: 0;
+            outline: none;
+        }
+
+        .setting div:hover {
+            border-style: dashed;
+        }
+
+        .preview {
+            position: fixed;
+            top: 27%;
+            right: 20px;
+        }
+        
+        .preview img {
+            width: 400px;
+        }
+        
+        .pixel {
+            margin-top: 5px;
+            margin-left: 20px;
+        }
+        
+        .pixel table {
+            width: 740px;
+            border-collapse: collapse;
+        }
+        
+        .pixel th,
+        .pixel td {
+            border: solid 0.2px rgba(128, 128, 128, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <form class='setting'>
+        <div>
+            <label>Upload a picture<input hidden type="file"></label>
+        </div>
+        <div>
+            <input type="text" placeholder='Change col number'>
+        </div>
+    </form>
+    <div class='preview'>
+        <img>
+    </div>
+    <div class='pixel'>
+        <table></table>
+    </div>
+</body>
+<script>
+    var $ = document.querySelector.bind(document);
+
+    var preview = $('img');
+    var canvas = document.createElement('canvas').getContext('2d')
+
+    var row = 50;
+    var col = 50;
+
+    function Pixel() {
+        return new Promise((resolve, reject) => {
+            var file = $('input[type=file]').files[0];
+            if (file)
+                var reader = new FileReader();
+            reader.onload = (event) => {
+                resolve(event.target)
+            };
+            reader.readAsDataURL(file);
+        })
+    }
+
+    function previewFile() {
+        Pixel().then((reader) => {
+            preview.src = reader.result;
+
+            $('table').style.height = preview.offsetHeight * 740 / preview.offsetWidth + 'px';
+            row = Math.round(preview.offsetHeight * col / preview.offsetWidth);
+
+            createTable(row, col);
+            canvas.drawImage(preview, 0, 0, col, row);
+            var tr = document.getElementsByTagName('tr');
+
+            for (var i = 0; i < row; i++) {
+                var td = tr[i].childNodes
+                for (var j = 0; j < col; j++) {
+                    td[j].style.backgroundColor = toRGBA(canvas.getImageData(j, i, 1, 1).data);
+                }
+            }
+        })
+    }
+
+    function createTable(rows, cols) {
+        var html = '';
+        for (var i = 0; i < rows; i++) {
+            html += '<tr>';
+            for (var j = 0; j < cols; j++) {
+                html += '<td></td>';
+            }
+            html += '</tr>';
+        }
+        $('table').innerHTML = html;
+    }
+
+
+    const toRGBA = (data) => {
+        return `rgba(${data[0]},${data[1]},${data[2]},${data[3]})`;
+    }
+
+    $('input[type=file]').addEventListener('change', previewFile)
+    $('input[type=text]').addEventListener('change', (event) => {
+        var num = Number.parseInt(event.target.value);
+        col = num || 50;
+        previewFile();
+    })
+
+</script>
+
+</html>
