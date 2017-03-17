@@ -2,9 +2,9 @@
 
 ### Preview
 
-![pixel_1](/Users/Hydrogen/Git/createPixel/pixel_1.png)
+![pixel_1](pixel_1.png)
 
-![pixel_2](/Users/Hydrogen/Git/createPixel/pixel_2.png)
+![pixel_2](pixel_2.png)
 
 ### How to use
 
