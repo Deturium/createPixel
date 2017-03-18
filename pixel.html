@@ -99,12 +99,13 @@
     function Pixel() {
         return new Promise((resolve, reject) => {
             let file = $('input[type=file]').files[0];
-            if (file)
-                var reader = new FileReader();
-            reader.onload = (event) => {
-                resolve(event.target)
-            };
-            reader.readAsDataURL(file);
+            if (file) {
+                let reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (event) => {
+                    resolve(event.target)
+                };
+            }
         })
     }
 
