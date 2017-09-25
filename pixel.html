@@ -102,7 +102,8 @@
             if (file) {
                 let reader = new FileReader();
                 reader.readAsDataURL(file);
-                reader.onload = (event) => {
+                reader.onload = () => {
+                    preview.src = event.target.result;
                     resolve(event.target)
                 };
             }
@@ -110,11 +111,10 @@
     }
 
     function previewFile() {
-        Pixel().then((reader) => {
-            preview.src = reader.result;
+        Pixel().then( () => {
 
-            $('table').style.height = preview.offsetHeight * 740 / preview.offsetWidth + 'px';
-            row = Math.round(preview.offsetHeight * col / preview.offsetWidth);
+            $('table').style.height = preview.naturalHeight * 740 / preview.naturalWidth + 'px';
+            row = Math.round(preview.naturalHeight * col / preview.naturalWidth);
 
             createTable(row, col);
             canvas.drawImage(preview, 0, 0, col, row);
@@ -146,19 +146,13 @@
                     }
                 }
             }
+            
         })
     }
 
     function createTable(rows, cols) {
-        let html = '';
-        for (let i = 0; i < rows; i++) {
-            html += '<tr>';
-            for (let j = 0; j < cols; j++) {
-                html += '<td></td>';
-            }
-            html += '</tr>';
-        }
-        $('table').innerHTML = html;
+        let html = `<tr>${'<td></td>'.repeat(cols)}</tr>`;
+        $('table').innerHTML = html.repeat(rows);
     }
 
 
