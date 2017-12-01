@@ -12,10 +12,18 @@ Download and open __pixel.html__.
 
 ### Notice
 
-If the __col__ is less than 50, there are some animations.
+1. Your browser should be support HTML5 and ES7.
 
-If the __col__ is setting more than 130, the pixel style table may be incomplete.
+2. If the __col__ is less or equal to 50, there are some animations.
+
+3. the __col__ should not be larger than 200.
 
 ### Completment
 
-You can use `FileReader()` in html5 and `drawImage()` in canvas.
+Use `FileReader()` in HTML5 and `drawImage()` in canvas.
+
+
+
+_update:_
+
+Use `createObjectURL` replace `FileReader`, because `DataURL` have length limit in some browsers.

@@ -2,170 +2,241 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <title>Pixel</title>
-    <style>
-        body {
-            font-family: Helvetica, sans-serif;
-            text-align: center
-        }
-        
-        .setting {
-            position: absolute;
-            top: 5%;
-            right: 140px;
-            width: 200px;
-        }
-        
-        .setting div {
-            width: 170px;
-            margin: 15px;
-            padding: 10px;
-            color: deepskyblue;
-            border: solid 2px deepskyblue;
-        }
-        
-        .setting div label {
-            font-size: 17px;
-            cursor: pointer;
-            text-align: center;
-        }
-        
-        .setting div input {
-            color: deepskyblue;
-            background-color: rgba(0, 0, 0, 0);
-            font-size: 16px;
-            text-align: center;
-            border: 0;
-            outline: none;
-        }
-        
-        .setting div:hover {
-            border-style: dashed;
-        }
-        
-        .preview {
-            position: fixed;
-            top: 27%;
-            right: 20px;
-        }
-        
-        .preview img {
-            width: 400px;
-        }
-        
-        .pixel {
-            margin-top: 5px;
-            margin-left: 20px;
-        }
-        
-        .pixel table {
-            width: 740px;
-            border-collapse: collapse;
-        }
-        
-        .pixel th,
-        .pixel td {
-            border: solid 0.2px rgba(128, 128, 128, 0.1);
-        }
-    </style>
+	<meta charset="UTF-8">
+	<title>Pixel</title>
+	<style>
+		body {
+			font-family: "ibm-plex-sans", "Helvetica Neue", Arial, sans-serif;
+		}
+
+		.title {
+			margin: 30px;
+			margin-top: 50px;
+			font-size: 3em;
+			font-weight: bold;
+			color: #66ccff;
+			text-align: center;
+		}
+
+		.warpper {
+			display: flex;
+			flex-wrap: wrap-reverse;
+			justify-content: space-around;
+			width: 100%;
+			box-sizing: border-box;
+			padding: 40px;
+		}
+
+
+		.setting {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			margin: 0 10px;
+			margin-bottom: 60px;
+		}
+
+		.setting .input-box {
+			margin-bottom: 20px;
+			color: deepskyblue;
+			border: solid 1.8px deepskyblue;
+			border-radius: 10px;
+		}
+
+		.setting .input-box:hover {
+			border-style: dashed;
+		}
+
+		.setting .input-box label,
+		.setting .input-box input {
+			width: 170px;
+			height: 40px;
+			line-height: 40px;
+			font-size: 1em;
+			text-align: center;
+			color: deepskyblue;
+		}
+
+		.setting .input-box label {
+			display: inline-block;
+			cursor: pointer;
+		}
+
+		.setting .input-box input {
+			padding: 0;
+			background-color: transparent;
+			border: none;
+			outline: none;
+		}
+
+		.preview-box {
+			margin-top: 40px;
+			color: #555;
+			text-align: center;
+		}
+
+		#preview{
+			display: block;
+			width: 400px;
+		}
+
+		#pixel{
+			width: 100%;
+			max-width: 800px;
+			min-width: 400px;
+		}
+	</style>
 </head>
 
 <body>
-    <form class='setting'>
-        <div>
-            <label>Upload a picture<input hidden type="file"></label>
-        </div>
-        <div>
-            <input type="text" placeholder='Change col number'>
-        </div>
-    </form>
-    <div class='preview'>
-        <img>
-    </div>
-    <div class='pixel'>
-        <table></table>
-    </div>
+	<h1 class="title">
+		Create Pixel Pic
+	</h1>
+	<div class="warpper">
+		<div>
+			<canvas id='pixel'></canvas>
+		</div>
+		<div class='setting'>
+			<div class="input-box">
+				<label>Upload a picture<input hidden type="file"></label>
+			</div>
+			<div class="input-box">
+				<input type="text" placeholder='Change col num'>
+			</div>
+			<div class='preview-box'>
+				<img id="preview" alt='No pic upload'>
+			</div>
+		</div>
+	</div>
 </body>
+
 <script>
-    let $ = document.querySelector.bind(document);
+	const $ = document.querySelector.bind(document)
 
-    let preview = $('img');
-    let canvas = document.createElement('canvas').getContext('2d')
+	const preview = $('#preview')
 
-    let row = 50;
-    let col = 50;
+	const hiddenCanvas = document.createElement('canvas')
+	const hiddenCtx = hiddenCanvas.getContext('2d')
 
-    function Pixel() {
-        return new Promise((resolve, reject) => {
-            let file = $('input[type=file]').files[0];
-            if (file) {
-                let reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => {
-                    preview.src = event.target.result;
-                    resolve(event.target)
-                };
-            }
-        })
-    }
-
-    function previewFile() {
-        Pixel().then( () => {
-
-            $('table').style.height = preview.naturalHeight * 740 / preview.naturalWidth + 'px';
-            row = Math.round(preview.naturalHeight * col / preview.naturalWidth);
-
-            createTable(row, col);
-            canvas.drawImage(preview, 0, 0, col, row);
-
-            if (col < 51) {
-                let i = 0;
-                let j = 0;
-                let td = document.getElementsByTagName('td')
-                function todo() {
-                    if (i < row && j < col)
-                        td[i * col + j].style.backgroundColor = toRGBA(canvas.getImageData(j, i, 1, 1).data);
-                    if (j < col) {
-                        j++;
-                        setTimeout(todo, 0);
-                    } else {
-                        if (i < row) {
-                            j = 0; i++;
-                            setTimeout(todo, 0);
-                        }
-                    }
-                }
-                todo();
-            } else {
-                let tr = document.getElementsByTagName('tr');
-                for (let i = 0; i < row; i++) {
-                    let td = tr[i].childNodes
-                    for (let j = 0; j < col; j++) {
-                        td[j].style.backgroundColor = toRGBA(canvas.getImageData(j, i, 1, 1).data);
-                    }
-                }
-            }
-            
-        })
-    }
-
-    function createTable(rows, cols) {
-        let html = `<tr>${'<td></td>'.repeat(cols)}</tr>`;
-        $('table').innerHTML = html.repeat(rows);
-    }
+	const canvas = $('#pixel')
+	const ctx = canvas.getContext('2d')
 
 
-    const toRGBA = (data) => {
-        return `rgba(${data[0]},${data[1]},${data[2]},${data[3]})`;
-    }
+	let row = 50
+	let col = 50
 
-    $('input[type=file]').addEventListener('change', previewFile)
-    $('input[type=text]').addEventListener('change', (event) => {
-        let num = Number.parseInt(event.target.value);
-        col = num || 50;
-        previewFile();
-    })
+	let picURL = ""
+
+	function previewFile() {
+		return new Promise(function (resolve, reject) {
+			const file = $('.input-box input[type=file]').files[0]
+			
+			if (!file) {
+				console.warn('No file selected')
+				reject() 
+			}
+
+			/* FileReader()
+				DataURL can't load large pic in chrome
+			*/
+
+			// const reader = new FileReader()
+			// reader.readAsDataURL(file)
+			// reader.onload = (event) => {
+			// 	preview.src = event.target.result
+			// 	resolve()
+			// }
+
+			URL.revokeObjectURL(picURL)
+
+			picURL = URL.createObjectURL(file)
+			preview.src = picURL
+
+			preview.addEventListener('load', resolve)
+		})
+	}
+
+	function drawGrid(canvas, ctx, color, stepX, stepY) {
+		ctx.strokeStyle = color
+		ctx.lineWidth = 1
+		for (let i = stepX + 0.5; i < canvas.width; i += stepX) {
+			ctx.beginPath()
+			ctx.moveTo(i, 0)
+			ctx.lineTo(i, canvas.height)
+			ctx.stroke()
+		}
+		for (let i = stepY + 0.5; i < canvas.height; i += stepY) {
+			ctx.beginPath()
+			ctx.moveTo(0, i)
+			ctx.lineTo(canvas.width, i)
+			ctx.stroke()
+		}
+	}
+
+	function drawSquare(ctx, i, j, width, color) {
+		ctx.fillStyle = color
+		ctx.fillRect(i * width, j * width, width, width)
+	}
+
+	function sleep(time) {
+		return new Promise(function(resolve) {
+			setTimeout(resolve, time)
+		})
+	}
+
+	async function pixel() {
+		
+		try {
+			await previewFile()
+		}
+		catch (err) {
+			return
+		}
+
+		if (!preview.naturalHeight) {
+			console.warn('File is not a pic.')
+			return
+		}
+
+		row = Math.round(preview.naturalHeight * col / preview.naturalWidth)
+
+		hiddenCanvas.width = col
+		hiddenCanvas.height = row
+
+		hiddenCtx.drawImage(preview, 0, 0, col, row)
+
+
+		const step = Math.floor(800 / col) + 3
+
+		canvas.width = col * step
+		canvas.height = row * step
+
+		drawGrid(canvas, ctx, 'rgba(128, 128, 128, 0.1)', step, step)
+
+		new Array(row).fill(null)
+			.map(async (_, i) => {
+				for (let j = 0; j < col; j++) {
+					const color = toRGBA(hiddenCtx.getImageData(j, i, 1, 1).data)		
+					drawSquare(ctx, j, i, step, color)
+					if (col < 51)
+						await sleep(60)
+				}
+			})
+	}
+
+	function toRGBA(data) {
+		return `rgba(${data[0]},${data[1]},${data[2]},${data[3]})`
+	}
+
+	$('.input-box input[type=file]').addEventListener('change', pixel)
+	$('.input-box input[type=text]').addEventListener('change', (event) => {
+		const num = parseInt(event.target.value)
+		if (isNaN(num) || num < 1 || num > 200) 
+			return
+
+		col = num
+		pixel()
+	})
 
 </script>
 
